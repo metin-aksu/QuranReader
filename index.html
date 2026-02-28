@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Kuran Okuma Uygulaması</title>
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --primary-dark: #1a252f;
+      --secondary: #3498db;
+      --secondary-hover: #2980b9;
+      --accent: #1abc9c;
+      --danger: #e74c3c;
+      --bg-color: #f4f4f9;
+      --text-main: #333;
+      --text-light: #fff;
+      --border-color: #ddd;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    #app {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+
+    /* Header (Visible mostly on mobile) */
+    .header {
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: var(--primary);
+      color: var(--text-light);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      width: 100%;
+    }
+
+    .header h2 {
+      font-size: 1.2rem;
+      font-weight: 500;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 180px;
+      background-color: var(--primary);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-title {
+      padding: 20px;
+      text-align: center;
+      font-size: 1.5rem;
+      border-bottom: 1px solid var(--primary-dark);
+    }
+
+    .sidebar-top {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .menu {
+      list-style: none;
+    }
+
+    .menu-item {
+      border-bottom: 1px solid var(--primary-dark);
+    }
+
+    .menu-btn {
+      width: 100%;
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      text-align: left;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+
+    .menu-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .arrow {
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+
+    /* Submenu */
+    .submenu {
+      display: none;
+      list-style: none;
+      background-color: var(--primary-dark);
+    }
+
+    .submenu.open {
+      display: block;
+    }
+
+    .submenu li {
+      padding: 12px 20px 12px 40px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 1rem;
+    }
+
+    .submenu li:hover {
+      background-color: var(--accent);
+    }
+
+    .juz-submenu {
+      max-height: 40vh;
+      overflow-y: auto;
+    }
+
+    /* Go To Page Container */
+    .go-to-container {
+      padding: 15px 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .go-to-container input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 4px;
+      outline: none;
+      width: 100%;
+    }
+
+    .go-to-container button {
+      padding: 8px 15px;
+      background-color: var(--accent);
+      border: none;
+      border-radius: 4px;
+      color: var(--text-light);
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .go-to-container button:hover {
+      opacity: 0.9;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background-image: radial-gradient(circle at center, #ffffff 0%, #f4f4f9 100%);
+    }
+
+    .page-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    #quran-page-img {
+      max-width: 100%;
+      max-height: calc(100vh - 120px);
+      object-fit: contain;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      background-color: white;
+      min-height: 300px;
+      border-radius: 4px;
+      transition: transform 0.2s ease-in-out;
+      transform-origin: top center;
+    }
+
+    .zoom-controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 5px;
+      z-index: 50;
+    }
+
+    .zoom-controls button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background-color: white;
+      color: var(--primary);
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .zoom-controls button:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: white;
+      border-top: 1px solid var(--border-color);
+      gap: 15px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--secondary);
+      color: var(--text-light);
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .controls button:hover:not(:disabled) {
+      background-color: var(--secondary-hover);
+      transform: translateY(-1px);
+    }
+
+    .controls button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .controls button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    #save-btn {
+      background-color: var(--accent);
+    }
+
+    #save-btn:hover {
+      background-color: #16a085;
+    }
+
+    .page-indicator {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      color: var(--primary);
+    }
+
+    /* Overlay for Mobile Drawer */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.open {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #app {
+        flex-direction: column;
+      }
+
+      .header {
+        display: flex;
+      }
+
+      .sidebar {
+        position: fixed;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        height: calc(100vh - 60px);
+      }
+
+      #quran-page-img {
+        max-height: calc(100vh - 180px);
+      }
+
+      .controls button {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        flex: 1;
+      }
+
+      .page-indicator {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <div class="header">
+      <button id="menu-toggle" class="menu-toggle">☰</button>
+      <h2>Kur'an</h2>
+      <div style="width: 80px;"></div> <!-- Spacer -->
+    </div>
+
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-top">
+        <h2 class="sidebar-title">Kur'an</h2>
+        <ul class="menu" id="menu-container">
+          <!-- Menu items will be generated by JS -->
+        </ul>
+      </div>
+    </aside>
+
+    <div id="overlay" class="overlay"></div>
+
+    <main class="main-content">
+      <div class="zoom-controls">
+        <button id="zoom-in-btn" title="Büyüt">+</button>
+        <button id="zoom-out-btn" title="Küçült">-</button>
+        <button id="zoom-fit-btn" title="Sıfırla">⟲</button>
+      </div>
+
+      <div class="page-container">
+        <img id="quran-page-img" src="/hayrat/0.jpg" alt="Kuran Sayfası 0" />
+      </div>
+      <div class="controls">
+        <button id="next-btn">Sonraki Sayfa</button>
+        <button id="save-btn">Bu Sayfada Kaldım</button>
+        <button id="prev-btn" disabled>Önceki Sayfa</button>
+      </div>
+      <div class="page-indicator">Sayfa: <span id="current-page-display">0</span></div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      // ------------------------------------
+      // CONSTANTS & STATE
+      // ------------------------------------
+      const IMPORTANT_SURAHS = {
+        'Yasin': 439,
+        'Fetih': 510,
+        'Vakıa': 533
+      };
+
+      const state = {
+        hat: 'diyanet', // 'hayrat' | 'diyanet'
+        page: 0,
+        maxPage: 604
+      };
+
+      // Initialize from localStorage
+      const storedPage = localStorage.getItem('stayedPage');
+      if (storedPage !== null) {
+        const p = parseInt(storedPage, 10);
+        if (!isNaN(p) && p >= 0 && p <= state.maxPage) {
+          state.page = p;
+        }
+      }
+
+      // ------------------------------------
+      // DOM ELEMENTS
+      // ------------------------------------
+      const menuContainer = document.getElementById('menu-container');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const menuToggle = document.getElementById('menu-toggle');
+      const imgEl = document.getElementById('quran-page-img');
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const pageDisplay = document.getElementById('current-page-display');
+
+      const zoomInBtn = document.getElementById('zoom-in-btn');
+      const zoomOutBtn = document.getElementById('zoom-out-btn');
+      const zoomFitBtn = document.getElementById('zoom-fit-btn');
+
+      let currentZoom = 1;
+
+      // ------------------------------------
+      // RENDER MENU
+      // ------------------------------------
+      function renderMenu() {
+        // Surahs HTML Generate
+        const surahsHtml = Object.keys(IMPORTANT_SURAHS).map(function (s) {
+          return '<li class="nav-item" data-action="set-page" data-value="' + IMPORTANT_SURAHS[s] + '">' + s + '</li>';
+        }).join('');
+
+        // Juz HTML Generate
+        const juzArr = [];
+        for (let i = 0; i < 30; i++) {
+          let val = i === 0 ? 0 : i * 20 + 1;
+          juzArr.push('<li class="nav-item" data-action="set-page" data-value="' + val + '">' + (i + 1) + '. Cüz</li>');
+        }
+        const juzHtml = juzArr.join('');
+
+        menuContainer.innerHTML = [
+          '<li class="menu-item">',
+          '  <button class="menu-btn" data-target="hat-submenu">Hat Seç <span class="arrow">▼</span></button>',
+          '  <ul id="hat-submenu" class="submenu">',
+          '    <li class="nav-item" data-action="set-hat" data-value="hayrat">Hayrat</li>',
+          '    <li class="nav-item" data-action="set-hat" data-value="diyanet">Diyanet</li>',
+          '  </ul>',
+          '</li>',
+          '<li class="menu-item">',
+          '  <div style="padding: 15px 20px 5px 20px; font-size: 1.1rem; color: var(--text-light);">Sayfaya Git</div>',
+          '  <div id="goto-submenu" class="go-to-container" style="padding-top: 5px;">',
+          '    <input type="number" id="goto-input" min="0" max="604" />',
+          '    <button id="goto-btn">Git</button>',
+          '  </div>',
+          '</li>',
+          '<li class="menu-item">',
+          '  <button class="menu-btn" data-target="surahs-submenu">Önemli Sureler <span class="arrow">▼</span></button>',
+          '  <ul id="surahs-submenu" class="submenu">',
+          surahsHtml,
+          '  </ul>',
+          '</li>',
+          '<li class="menu-item">',
+          '  <button class="menu-btn" data-target="juz-submenu">Cüzler <span class="arrow">▼</span></button>',
+          '  <ul id="juz-submenu" class="submenu juz-submenu">',
+          juzHtml,
+          '  </ul>',
+          '</li>'
+        ].join('');
+      }
+
+      renderMenu();
+
+      // Elements created dynamically after renderMenu
+      const gotoInput = document.getElementById('goto-input');
+      const gotoBtn = document.getElementById('goto-btn');
+      const menuBtns = document.querySelectorAll('.menu-btn');
+      const navItems = document.querySelectorAll('.nav-item');
+
+      // ------------------------------------
+      // CORE LOGIC
+      // ------------------------------------
+      function updateImage() {
+        imgEl.src = '/' + state.hat + '/' + state.page + '.jpg';
+        imgEl.alt = 'Kuran Sayfası ' + state.page;
+        pageDisplay.textContent = state.page;
+
+        prevBtn.disabled = state.page <= 0;
+        nextBtn.disabled = state.page >= state.maxPage;
+
+        // Close sidebar mobile when nav happens
+        if (window.innerWidth <= 768) {
+          closeSidebar();
+        }
+
+        applyZoom(); // Reset or maintain zoom behavior on change can be handled here. Currently keeping zoom level.
+      }
+
+      function applyZoom() {
+        imgEl.style.transform = 'scale(' + currentZoom + ')';
+        imgEl.parentElement.style.alignItems = currentZoom > 1 ? 'flex-start' : 'center';
+      }
+
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+      }
+
+      function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+
+      // ------------------------------------
+      // EVENT LISTENERS
+      // ------------------------------------
+      prevBtn.addEventListener('click', function () {
+        if (state.page > 0) {
+          state.page--;
+          updateImage();
+        }
+      });
+
+      nextBtn.addEventListener('click', function () {
+        if (state.page < state.maxPage) {
+          state.page++;
+          updateImage();
+        }
+      });
+
+      saveBtn.addEventListener('click', function () {
+        localStorage.setItem('stayedPage', state.page);
+        alert(state.page + '. sayfada kaldığınız kaydedildi.');
+      });
+
+      zoomInBtn.addEventListener('click', function () {
+        currentZoom += 0.2;
+        applyZoom();
+      });
+
+      zoomOutBtn.addEventListener('click', function () {
+        if (currentZoom > 0.4) {
+          currentZoom -= 0.2;
+          applyZoom();
+        }
+      });
+
+      zoomFitBtn.addEventListener('click', function () {
+        currentZoom = 1;
+        applyZoom();
+      });
+
+      menuToggle.addEventListener('click', openSidebar);
+      overlay.addEventListener('click', closeSidebar);
+
+      // Accordions
+      for (let i = 0; i < menuBtns.length; i++) {
+        menuBtns[i].addEventListener('click', function (e) {
+          const targetId = this.getAttribute('data-target');
+          if (targetId) {
+            const targetMenu = document.getElementById(targetId);
+            if (targetMenu) {
+              // Close all others
+              const allSubmenus = document.querySelectorAll('.submenu');
+              for (let j = 0; j < allSubmenus.length; j++) {
+                if (allSubmenus[j] !== targetMenu) {
+                  allSubmenus[j].classList.remove('open');
+                }
+              }
+              // Toggle clicked
+              targetMenu.classList.toggle('open');
+            }
+          }
+        });
+      }
+
+      // Submenu navigations
+      for (let i = 0; i < navItems.length; i++) {
+        navItems[i].addEventListener('click', function (e) {
+          const action = this.getAttribute('data-action');
+          const value = this.getAttribute('data-value');
+
+          if (action === 'set-hat' && value) {
+            state.hat = value;
+            updateImage();
+          } else if (action === 'set-page' && value !== null) {
+            const pageNum = parseInt(value, 10);
+            if (!isNaN(pageNum)) {
+              state.page = pageNum;
+              updateImage();
+            }
+          }
+        });
+      }
+
+      // Goto Page custom
+      gotoBtn.addEventListener('click', function () {
+        let p = parseInt(gotoInput.value, 10);
+        if (!isNaN(p)) {
+          if (p < 0) p = 0;
+          if (p > state.maxPage) p = state.maxPage;
+          state.page = p;
+          updateImage();
+        }
+      });
+
+      // Make sure initial state shows up accurately
+      updateImage();
+
+    })();
+  </script>
+
+</body>
+
+</html>
