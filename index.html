@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="favicon.png">
-  <title>Kuran Okuma Uygulaması</title>
+  <title>Kur'an</title>
   <style>
     :root {
       --primary: #2c3e50;
@@ -414,11 +414,122 @@
       // ------------------------------------
       // CONSTANTS & STATE
       // ------------------------------------
-      const IMPORTANT_SURAHS = {
-        'Yasin': 439,
-        'Fetih': 510,
-        'Vakıa': 533
-      };
+      const SURAHS = [
+        {name: 'Abese', page: 584},
+        {name: 'Âdiyât', page: 599},
+        {name: 'Ahkâf', page: 501},
+        {name: 'Ahzâb', page: 417},
+        {name: 'Alâ', page: 591},
+        {name: 'Alak', page: 597},
+        {name: 'Âl-i İmrân', page: 49},
+        {name: 'Ankebût', page: 395},
+        {name: 'Arâf', page: 150},
+        {name: 'Asr', page: 601},
+        {name: 'Bakara', page: 1},
+        {name: 'Beled', page: 593},
+        {name: 'Beyyine', page: 598},
+        {name: 'Burûc', page: 589},
+        {name: 'Câsiye', page: 498},
+        {name: 'Cin', page: 571},
+        {name: 'Cumâ', page: 552},
+        {name: 'Duhâ', page: 595},
+        {name: 'Duhân', page: 495},
+        {name: 'Enâm', page: 127},
+        {name: 'Enbiyâ', page: 321},
+        {name: 'Enfâl', page: 176},
+        {name: 'Fatiha', page: 0},
+        {name: 'Fâtır', page: 433},
+        {name: 'Fecr', page: 592},
+        {name: 'Felak', page: 604},
+        {name: 'Fetih', page: 510},
+        {name: 'Fîl', page: 601},
+        {name: 'Furkân', page: 358},
+        {name: 'Fussilet', page: 476},
+        {name: 'Ğâşiye', page: 591},
+        {name: 'Hac', page: 331},
+        {name: 'Hadîd', page: 536},
+        {name: 'Hâkka', page: 565},
+        {name: 'Haşr', page: 544},
+        {name: 'Hicr', page: 261},
+        {name: 'Hucurât', page: 514},
+        {name: 'Hûd', page: 220},
+        {name: 'Hümeze', page: 601},
+        {name: 'İbrâhîm', page: 254},
+        {name: 'İhlâs', page: 604},
+        {name: 'İnfitâr', page: 586},
+        {name: 'İnsân', page: 577},
+        {name: 'İnşikâk', page: 588},
+        {name: 'İnşirâh', page: 596},
+        {name: 'İsrâ', page: 281},
+        {name: 'Kâf', page: 517},
+        {name: 'Kâfirûn', page: 602},
+        {name: 'Kadir', page: 598},
+        {name: 'Kalem', page: 563},
+        {name: 'Kamer', page: 527},
+        {name: 'Kasas', page: 384},
+        {name: 'Kâria', page: 600},
+        {name: 'Kehf', page: 292},
+        {name: 'Kevser', page: 602},
+        {name: 'Kıyâme', page: 576},
+        {name: 'Kureyş', page: 602},
+        {name: 'Leyl', page: 595},
+        {name: 'Lokmân', page: 410},
+        {name: 'Mâide', page: 105},
+        {name: 'Mâûn', page: 602},
+        {name: 'Meâric', page: 567},
+        {name: 'Meryem', page: 304},
+        {name: 'Muhammed', page: 506},
+        {name: 'Mücâdele', page: 541},
+        {name: 'Mümînûn', page: 341},
+        {name: 'Mümtehine', page: 548},
+        {name: 'Münâfikûn', page: 553},
+        {name: 'Mürselât', page: 579},
+        {name: 'Mutaffifîn', page: 587},
+        {name: "Mü'min", page: 466},
+        {name: 'Müddessir', page: 574},
+        {name: 'Mülk', page: 561},
+        {name: 'Müzzemmil', page: 573},
+        {name: 'Nahl', page: 266},
+        {name: 'Nasr', page: 603},
+        {name: 'Nâs', page: 604},
+        {name: 'Nâziât', page: 582},
+        {name: 'Nebe', page: 581},
+        {name: 'Necm', page: 525},
+        {name: 'Neml', page: 376},
+        {name: 'Nisâ', page: 76},
+        {name: 'Nûh', page: 569},
+        {name: 'Nûr', page: 349},
+        {name: 'Raʿd', page: 248},
+        {name: 'Rahmân', page: 530},
+        {name: 'Rûm', page: 403},
+        {name: 'Sâd', page: 452},
+        {name: 'Saf', page: 550},
+        {name: 'Sâffât', page: 445},
+        {name: 'Sebe', page: 427},
+        {name: 'Secde', page: 414},
+        {name: 'Şems', page: 594},
+        {name: 'Şuarâ', page: 366},
+        {name: 'Şûrâ', page: 482},
+        {name: 'Tâhâ', page: 311},
+        {name: 'Tahrîm', page: 559},
+        {name: 'Talâk', page: 557},
+        {name: 'Târık', page: 590},
+        {name: 'Tebbet', page: 603},
+        {name: 'Teğâbün', page: 555},
+        {name: 'Tekvîr', page: 585},
+        {name: 'Tekâsür', page: 600},
+        {name: 'Tevbe', page: 186},
+        {name: 'Tîn', page: 596},
+        {name: 'Tûr', page: 522},
+        {name: 'Vâkıa', page: 533},
+        {name: 'Yâsîn', page: 439},
+        {name: 'Yûnus', page: 207},
+        {name: 'Yûsuf', page: 234},
+        {name: 'Zâriyât', page: 519},
+        {name: 'Zilzâl', page: 599},
+        {name: 'Zuhruf', page: 488},
+        {name: 'Zümer', page: 457}
+      ];
 
       const state = {
         hat: 'diyanet', // 'hayrat' | 'diyanet'
@@ -458,9 +569,12 @@
       // RENDER MENU
       // ------------------------------------
       function renderMenu() {
-        // Surahs HTML Generate
-        const surahsHtml = Object.keys(IMPORTANT_SURAHS).map(function (s) {
-          return '<li class="nav-item" data-action="set-page" data-value="' + IMPORTANT_SURAHS[s] + '">' + s + '</li>';
+        // Sureler HTML Generate (alfabetik sıralı)
+        const sortedSurahs = SURAHS.slice().sort(function (a, b) {
+          return a.name.localeCompare(b.name, 'tr');
+        });
+        const surahsHtml = sortedSurahs.map(function (s) {
+          return '<li class="nav-item" data-action="set-page" data-value="' + s.page + '">' + s.name + '</li>';
         }).join('');
 
         // Juz HTML Generate
@@ -487,8 +601,8 @@
           '  </div>',
           '</li>',
           '<li class="menu-item">',
-          '  <button class="menu-btn" data-target="surahs-submenu">Önemli Sureler <span class="arrow">▼</span></button>',
-          '  <ul id="surahs-submenu" class="submenu">',
+          '  <button class="menu-btn" data-target="surahs-submenu">Sureler <span class="arrow">▼</span></button>',
+          '  <ul id="surahs-submenu" class="submenu juz-submenu">',
           surahsHtml,
           '  </ul>',
           '</li>',
