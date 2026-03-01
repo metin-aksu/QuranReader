@@ -94,7 +94,9 @@
 
     .sidebar-top {
       flex: 1;
-      overflow-y: auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .menu {
@@ -152,7 +154,6 @@
     }
 
     .juz-submenu {
-      max-height: 40vh;
       overflow-y: auto;
     }
 
@@ -589,8 +590,8 @@
           '<li class="menu-item">',
           '  <button class="menu-btn" data-target="hat-submenu">Hat Seç <span class="arrow">▼</span></button>',
           '  <ul id="hat-submenu" class="submenu">',
-          '    <li class="nav-item" data-action="set-hat" data-value="hayrat">Hayrat</li>',
           '    <li class="nav-item" data-action="set-hat" data-value="diyanet">Diyanet</li>',
+          '    <li class="nav-item" data-action="set-hat" data-value="hayrat">Hayrat</li>',
           '  </ul>',
           '</li>',
           '<li class="menu-item">',
@@ -711,10 +712,19 @@
               for (let j = 0; j < allSubmenus.length; j++) {
                 if (allSubmenus[j] !== targetMenu) {
                   allSubmenus[j].classList.remove('open');
+                  allSubmenus[j].style.maxHeight = '';
                 }
               }
               // Toggle clicked
               targetMenu.classList.toggle('open');
+              if (targetMenu.classList.contains('open') && targetMenu.classList.contains('juz-submenu')) {
+                const sidebarRect = sidebar.getBoundingClientRect();
+                const btnRect = this.getBoundingClientRect();
+                const remainingHeight = sidebarRect.bottom - btnRect.bottom;
+                targetMenu.style.maxHeight = remainingHeight + 'px';
+              } else {
+                targetMenu.style.maxHeight = '';
+              }
             }
           }
         });
